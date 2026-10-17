@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10243a">
+<meta name="description" content="Seth Sanwariya Real Estate CRM">
+<link rel="manifest" href="manifest.json">
+<title>Seth Sanwariya CRM</title>
+<style>
+:root{--navy:#10243a;--gold:#d8ad55;--bg:#f3f5f8;--ink:#172334;--muted:#637184;--line:#dce2e9;--white:#fff;--red:#b42318;--green:#137547}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--navy);color:white;padding:18px 16px 14px;position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #0002}
+.brand{font-size:19px;font-weight:800;letter-spacing:.2px}.sub{font-size:12px;color:#e7d5a7;margin-top:3px}
+.wrap{max-width:900px;margin:auto;padding:14px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs{display:flex;gap:7px;overflow:auto;margin:0 0 12px}
+button,.btn{border:0;border-radius:10px;padding:11px 13px;font-weight:700;cursor:pointer;background:var(--navy);color:white}
+button.gold{background:var(--gold);color:#172334}button.ghost{background:#e8edf3;color:var(--navy)}button.danger{background:#fff0ee;color:var(--red)}button:disabled{opacity:.5}
+.tab{white-space:nowrap;background:#e5eaf0;color:#25364b}.tab.active{background:var(--gold);color:#172334}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px #17233408}
+h2{font-size:17px;margin:0 0 12px}h3{font-size:15px;margin:0 0 6px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#f7f8fa;border-radius:12px;padding:13px}.num{font-size:25px;font-weight:800;color:var(--navy)}.label{font-size:12px;color:var(--muted)}
+label{font-size:12px;font-weight:700;color:#455367;display:block;margin-bottom:5px}input,select,textarea{width:100%;border:1px solid #ccd5df;border-radius:9px;padding:11px;background:#fff;font:inherit;color:var(--ink);min-width:0}
+textarea{min-height:76px;resize:vertical}.field{margin-bottom:11px}.wide{grid-column:1/-1}
+.lead{padding:12px 0;border-bottom:1px solid var(--line)}.lead:last-child{border-bottom:0}.leadtop{display:flex;justify-content:space-between;gap:8px}.name{font-weight:800;font-size:16px}.muted{color:var(--muted);font-size:12px}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#edf1f5;font-size:11px;font-weight:700}
+.hide{display:none!important}.small{font-size:12px}.notice{border-radius:10px;padding:10px;background:#fff7e5;color:#77530b;font-size:12px;line-height:1.45}.success{background:#e8f7ee;color:#145c34}.error{background:#fff0ee;color:#9c2218}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+@media(min-width:650px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="brand">SETH SANWARIYA</div><div class="sub">REAL ESTATE CRM · Personal workspace</div><div id="accountLine" class="small" style="margin-top:9px">Not signed in · Local mode</div></header>
+<div class="wrap">
+  <div id="setupNotice" class="notice" style="margin-bottom:12px">
+    <b>Setup status:</b> Ye starter app local/offline mode mein chal sakti hai. Google login aur online sync shuru karne ke liye README mein Firebase setup complete karna hoga. Is file mein abhi koi email/cloud account connect nahi hai.
+  </div>
+  <div class="card" id="authCard">
+    <h2>Account & Sync</h2>
+    <div id="authStatus" class="muted" style="margin-bottom:10px">Offline/local workspace active. Cloud sync not configured.</div>
+    <div class="row">
+      <button id="loginBtn" class="gold">Google se login</button>
+      <button id="logoutBtn" class="ghost hide">Logout</button>
+      <button id="syncBtn" class="ghost">Sync now</button>
+    </div>
+    <div class="muted" style="margin-top:10px">Har Google account ka data alag UID ke andar store hoga. Account switch karne se doosre account ka data merge nahi hoga.</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="leads">Leads</button>
+    <button class="tab" data-tab="add">+ Lead</button>
+    <button class="tab" data-tab="projects">Projects</button>
+    <button class="tab" data-tab="settings">Backup & Settings</button>
+  </div>
+
+  <section id="dashboard" class="view">
+    <div class="stats">
+      <div class="stat"><div class="num" id="sTotal">0</div><div class="label">Total leads</div></div>
+      <div class="stat"><div class="num" id="sFollow">0</div><div class="label">Follow-ups due</div></div>
+      <div class="stat"><div class="num" id="sVisits">0</div><div class="label">Site visits</div></div>
+      <div class="stat"><div class="num" id="sDeals">0</div><div class="label">Deals closed</div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h2>Next follow-ups</h2><div id="dueList" class="muted">Abhi koi lead nahi.</div></div>
+    <div class="card"><h2>Recent leads</h2><div id="recentList" class="muted">Abhi koi lead nahi.</div></div>
+  </section>
+
+  <section id="leads" class="view hide">
+    <div class="card">
+      <h2>Customer leads</h2>
+      <div class="grid">
+        <div class="field"><label>Search name / phone</label><input id="searchLead" placeholder="Naam ya phone"></div>
+        <div class="field"><label>Project filter</label><select id="filterProject"><option value="">All projects</option></select></div>
+        <div class="field"><label>Lead status</label><select id="filterStatus"><option value="">All statuses</option><option>New</option><option>Follow-up</option><option>Interested</option><option>Site Visit Planned</option><option>Site Visited</option><option>Negotiation</option><option>Deal Closed</option><option>Not Interested</option></select></div>
+      </div>
+      <div id="leadList"></div>
+    </div>
+  </section>
+
+  <section id="add" class="view hide">
+    <div class="card">
+      <h2 id="formTitle">Add new lead</h2>
+      <form id="leadForm">
+        <input id="editId" type="hidden">
+        <div class="grid">
+          <div class="field"><label>Customer name *</label><input id="customer" required placeholder="Customer ka naam"></div>
+          <div class="field"><label>Phone number *</label><input id="phone" required inputmode="tel" placeholder="Mobile number"></div>
+          <div class="field"><label>Project name *</label><input id="project" list="projectOptions" required placeholder="Project select / type karein"><datalist id="projectOptions"></datalist></div>
+          <div class="field"><label>Lead status</label><select id="status"><option>New</option><option>Follow-up</option><option>Interested</option><option>Site Visit Planned</option><option>Site Visited</option><option>Negotiation</option><option>Deal Closed</option><option>Not Interested</option></select></div>
+          <div class="field"><label>Next follow-up date</label><input id="followDate" type="date"></div>
+          <div class="field"><label>Budget / requirement</label><input id="budget" placeholder="Jaise 25 lakh, 100 gaj"></div>
+          <div class="field"><label>Site visit date</label><input id="visitDate" type="date"></div>
+          <div class="field"><label>Site visit status</label><select id="visitStatus"><option>Not planned</option><option>Planned</option><option>Visited</option><option>Rescheduled</option><option>Cancelled</option></select></div>
+          <div class="field"><label>Visit handled by</label><input id="visitBy" placeholder="Aapka naam / person"></div>
+          <div class="field"><label>Lead source</label><select id="source"><option>Phone call</option><option>Meta Ads</option><option>Instagram</option><option>Facebook</option><option>WhatsApp</option><option>Reference</option><option>Walk-in</option><option>Other</option></select></div>
+          <div class="field wide"><label>Call notes / customer discussion</label><textarea id="notes" placeholder="Kis project par baat hui, objection, next action..."></textarea></div>
+        </div>
+        <div class="row"><button class="gold" type="submit">Save lead</button><button class="ghost" type="button" id="clearForm">Clear</button></div>
+        <div id="formMsg" class="muted" style="margin-top:8px"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="projects" class="view hide">
+    <div class="card">
+      <h2>Projects list</h2>
+      <p class="muted">Yahan project names add kar sakte ho. Lead form mein ye suggestions milenge.</p>
+      <div class="row"><input id="newProject" placeholder="Naya project name"><button id="addProject" class="gold">Add project</button></div>
+      <div id="projectList" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="view hide">
+    <div class="card">
+      <h2>Backup & Restore</h2>
+      <p class="muted">Backup file ko phone ke Downloads ya Google Drive mein safe rakhein. Online sync configure hone ke baad bhi periodic export backup useful hai.</p>
+      <div class="row"><button id="exportBtn" class="gold">Download backup (JSON)</button><button id="exportCsvBtn" class="ghost">Leads CSV</button></div>
+      <hr>
+      <label>Restore backup file</label><input id="importFile" type="file" accept=".json,application/json">
+      <button id="importBtn" class="ghost" style="margin-top:8px">Restore selected backup</button>
+      <div class="notice" style="margin-top:12px">Restore karne par current workspace ke leads/projects replace honge. Pehle current backup download kar lena.</div>
+    </div>
+    <div class="card">
+      <h2>Projects / local data</h2>
+      <div id="settingsInfo" class="muted"></div>
+      <hr>
+      <button id="clearLocalBtn" class="danger">Clear this device's local data</button>
+      <div class="muted" style="margin-top:8px">Isse cloud data delete nahi hota. Button sirf local copy clear karta hai; use tabhi karein jab zaroorat ho.</div>
+    </div>
+  </section>
+  <p class="muted small" style="text-align:center;padding:8px 0 20px">Seth Sanwariya CRM · Personal use · Keep backups safe</p>
+</div>
+<script type="module">
+const $ = id => document.getElementById(id);
+let LOCAL_KEY = 'sethSanwariyaCrm_v1_guest';
+let PROJECT_KEY = 'sethSanwariyaProjects_v1_guest';
+let leads = [], projects = ['Ganpati Residency – II','Shiv Residency','Pahadiya Hills Farmhouse'], currentUser = null, cloudReady = false, db = null, auth = null, firebaseFns = null, saveTimer = null;
+function setStorageScope(user){const suffix=user ? user.uid : 'guest';LOCAL_KEY='sethSanwariyaCrm_v1_'+suffix;PROJECT_KEY='sethSanwariyaProjects_v1_'+suffix;loadLocal();renderAll();}
+const today = () => new Date().toISOString().slice(0,10);
+const uid = () => 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+function loadLocal(){try{leads=JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]');projects=JSON.parse(localStorage.getItem(PROJECT_KEY)||'null')||projects;}catch(e){leads=[]}}
+function saveLocal(){localStorage.setItem(LOCAL_KEY,JSON.stringify(leads));localStorage.setItem(PROJECT_KEY,JSON.stringify(projects));renderAll();if(cloudReady&&currentUser){clearTimeout(saveTimer);saveTimer=setTimeout(syncToCloud,700)}}
+function setMsg(s,cls='muted'){ $('formMsg').className=cls; $('formMsg').textContent=s; }
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showTab(tab){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hide',v.id!==tab));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function updateProjectChoices(){
+ $('projectOptions').innerHTML=projects.map(p=>`<option value="${esc(p)}">`).join('');
+ const old=$('filterProject').value;
+ $('filterProject').innerHTML='<option value="">All projects</option>'+projects.map(p=>`<option>${esc(p)}</option>`).join('');
+ $('filterProject').value=old;
+ $('projectList').innerHTML=projects.map(p=>`<div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid #e4e8ed"><span>${esc(p)}</span><button class="ghost" data-remove-project="${esc(p)}">Remove</button></div>`).join('')||'<p class="muted">No projects</p>';
+ $('projectList').querySelectorAll('[data-remove-project]').forEach(b=>b.onclick=()=>{const p=b.dataset.removeProject;if(leads.some(l=>l.project===p)){alert('Is project par leads hain. Pehle leads ka project update karein.');return}projects=projects.filter(x=>x!==p);saveLocal();updateProjectChoices()});
+ $('settingsInfo').textContent=`${leads.length} local leads · ${projects.length} projects · Account: ${currentUser?.email||'Local only'}`;
+}
+function leadCard(l){return `<div class="lead"><div class="leadtop"><div><div class="name">${esc(l.customer)}</div><div class="muted">${esc(l.phone)} · ${esc(l.project)}</div></div><span class="pill">${esc(l.status||'New')}</span></div><div class="row" style="margin-top:8px"><span class="pill">Visit: ${esc(l.visitStatus||'Not planned')}</span>${l.followDate?`<span class="pill">Follow-up: ${esc(l.followDate)}</span>`:''}${l.visitDate?`<span class="pill">Visit date: ${esc(l.visitDate)}</span>`:''}</div>${l.notes?`<p class="small">${esc(l.notes)}</p>`:''}<div class="row" style="margin-top:8px"><button class="ghost" data-edit="${esc(l.id)}">Edit</button><a class="btn" style="text-decoration:none;font-size:13px;padding:11px" href="tel:${esc(l.phone)}">Call</a><button class="danger" data-delete="${esc(l.id)}">Delete</button></div></div>`}
+function wireLeadButtons(root){root.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editLead(b.dataset.edit));root.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('Is lead ko delete karna hai?')){leads=leads.filter(l=>l.id!==b.dataset.delete);saveLocal()}})}
+function renderAll(){
+ updateProjectChoices();
+ $('sTotal').textContent=leads.length;
+ $('sFollow').textContent=leads.filter(l=>l.followDate&&l.followDate<=today()&&!['Deal Closed','Not Interested'].includes(l.status)).length;
+ $('sVisits').textContent=leads.filter(l=>l.visitStatus==='Visited').length;
+ $('sDeals').textContent=leads.filter(l=>l.status==='Deal Closed').length;
+ const due=leads.filter(l=>l.followDate&&l.followDate<=today()&&!['Deal Closed','Not Interested'].includes(l.status)).sort((a,b)=>a.followDate.localeCompare(b.followDate));
+ $('dueList').innerHTML=due.length?due.slice(0,8).map(leadCard).join(''):'<span class="muted">Koi due follow-up nahi.</span>';
+ $('recentList').innerHTML=leads.length?[...leads].sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||'')).slice(0,5).map(leadCard).join(''):'<span class="muted">Abhi koi lead nahi.</span>';
+ const q=$('searchLead').value.toLowerCase(), fp=$('filterProject').value, fs=$('filterStatus').value;
+ const filtered=leads.filter(l=>(!q||(l.customer+' '+l.phone).toLowerCase().includes(q))&&(!fp||l.project===fp)&&(!fs||l.status===fs)).sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+ $('leadList').innerHTML=filtered.length?filtered.map(leadCard).join(''):'<p class="muted">Koi lead match nahi hui.</p>';
+ wireLeadButtons($('dueList'));wireLeadButtons($('recentList'));wireLeadButtons($('leadList'));
+ $('settingsInfo').textContent=`${leads.length} local leads · ${projects.length} projects · Account: ${currentUser?.email||'Local only'}`;
+}
+['searchLead','filterProject','filterStatus'].forEach(id=>$(id).addEventListener(id==='searchLead'?'input':'change',renderAll));
+function resetForm(){$('leadForm').reset();$('editId').value='';$('formTitle').textContent='Add new lead';setMsg('');}
+$('clearForm').onclick=resetForm;
+function editLead(id){const l=leads.find(x=>x.id===id);if(!l)return;showTab('add');$('editId').value=l.id;$('customer').value=l.customer||'';$('phone').value=l.phone||'';$('project').value=l.project||'';$('status').value=l.status||'New';$('followDate').value=l.followDate||'';$('budget').value=l.budget||'';$('visitDate').value=l.visitDate||'';$('visitStatus').value=l.visitStatus||'Not planned';$('visitBy').value=l.visitBy||'';$('source').value=l.source||'Phone call';$('notes').value=l.notes||'';$('formTitle').textContent='Edit lead';}
+$('leadForm').onsubmit=e=>{e.preventDefault();const id=$('editId').value||uid();const old=leads.find(x=>x.id===id)||{};const l={...old,id,customer:$('customer').value.trim(),phone:$('phone').value.trim(),project:$('project').value.trim(),status:$('status').value,followDate:$('followDate').value,budget:$('budget').value.trim(),visitDate:$('visitDate').value,visitStatus:$('visitStatus').value,visitBy:$('visitBy').value.trim(),source:$('source').value,notes:$('notes').value.trim(),updatedAt:new Date().toISOString(),createdAt:old.createdAt||new Date().toISOString()};if(!l.customer||!l.phone||!l.project){setMsg('Naam, phone aur project zaroori hain.','error');return}if(!projects.includes(l.project))projects.push(l.project);const i=leads.findIndex(x=>x.id===id);if(i>=0)leads[i]=l;else leads.push(l);saveLocal();resetForm();setMsg('Lead save ho gayi.','success');showTab('leads');};
+$('addProject').onclick=()=>{const p=$('newProject').value.trim();if(p&&!projects.includes(p)){projects.push(p);$('newProject').value='';saveLocal();updateProjectChoices()}};
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('exportBtn').onclick=()=>download(`seth-sanwariya-backup-${today()}.json`,JSON.stringify({app:'Seth Sanwariya CRM',version:1,exportedAt:new Date().toISOString(),leads,projects},null,2),'application/json');
+$('exportCsvBtn').onclick=()=>{const cols=['customer','phone','project','status','followDate','budget','visitDate','visitStatus','visitBy','source','notes','updatedAt'];const csv=[cols.join(','),...leads.map(l=>cols.map(k=>'"'+String(l[k]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');download(`seth-sanwariya-leads-${today()}.csv`,'\ufeff'+csv,'text/csv;charset=utf-8')};
+$('importBtn').onclick=async()=>{const f=$('importFile').files[0];if(!f){alert('Pehle JSON backup file select karein.');return}try{const data=JSON.parse(await f.text());if(!Array.isArray(data.leads)||!Array.isArray(data.projects))throw new Error('Invalid backup');if(!confirm('Current local data replace hoga. Pehle backup download kiya? Restore continue karein?'))return;leads=data.leads;projects=data.projects;saveLocal();alert('Backup restore ho gaya.');}catch(e){alert('Backup file sahi nahi hai. JSON backup select karein.')}};
+$('clearLocalBtn').onclick=()=>{if(confirm('Is device ki local leads/projects copy clear karni hai? Pehle backup lein.')){leads=[];projects=[];saveLocal();}};
+/* Firebase setup: fill firebaseConfig in README-described section, then rebuild/host this file.
+   Uses one private Firestore path per authenticated UID. */
+const firebaseConfig = null; // TODO: add your Firebase web app config here after setup
+async function initFirebase(){
+ if(!firebaseConfig){$('authStatus').textContent='Cloud sync abhi configured nahi hai. README ke Firebase steps complete karne honge.';$('loginBtn').disabled=true;$('syncBtn').disabled=true;return}
+ try{
+  const appMod=await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js');
+  const authMod=await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js');
+  const fsMod=await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js');
+  const app=appMod.initializeApp(firebaseConfig);auth=authMod.getAuth(app);db=fsMod.getFirestore(app);firebaseFns={...authMod,...fsMod};cloudReady=true;
+  authMod.onAuthStateChanged(auth,async user=>{currentUser=user||null;setStorageScope(currentUser);$('accountLine').textContent=user?`Signed in: ${user.email}`:'Not signed in · Local mode';$('authStatus').textContent=user?`Signed in as ${user.email}. Data is scoped to this account.`:'Not signed in · Guest local workspace.';$('loginBtn').classList.toggle('hide',!!user);$('logoutBtn').classList.toggle('hide',!user);if(user){await loadCloudForUser();}renderAll()});
+  $('loginBtn').disabled=false;$('syncBtn').disabled=false;
+ }catch(e){$('authStatus').textContent='Firebase setup error: '+e.message}
+}
+$('loginBtn').onclick=async()=>{if(!cloudReady)return;try{await firebaseFns.signInWithPopup(auth,new firebaseFns.GoogleAuthProvider())}catch(e){alert('Login error: '+e.message)}};
+$('logoutBtn').onclick=async()=>{if(auth)await firebaseFns.signOut(auth)};
+$('syncBtn').onclick=async()=>{if(!currentUser){alert('Pehle Google se login karein.');return}await syncToCloud(true)};
+async function loadCloudForUser(){
+ try{
+  const {collection,getDocs}=firebaseFns;const ref=collection(db,'users',currentUser.uid,'leads');const snap=await getDocs(ref);
+  if(!snap.empty){const remote=snap.docs.map(d=>d.data());const map=new Map(leads.map(l=>[l.id,l]));for(const r of remote){const old=map.get(r.id);if(!old||(r.updatedAt||'')>(old.updatedAt||''))map.set(r.id,r)}leads=[...map.values()];saveLocalNoSync()}
+  const pref=collection(db,'users',currentUser.uid,'projects');const ps=await getDocs(pref);if(!ps.empty){const rp=ps.docs.map(d=>d.data().name).filter(Boolean);projects=[...new Set([...projects,...rp])];saveLocalNoSync()}
+  await syncToCloud(false);$('authStatus').textContent=`Signed in: ${currentUser.email} · Last sync ${new Date().toLocaleTimeString()}`;
+ }catch(e){$('authStatus').textContent='Cloud read/sync failed: '+e.message+' · Local data remains on this device.'}
+}
+function saveLocalNoSync(){localStorage.setItem(LOCAL_KEY,JSON.stringify(leads));localStorage.setItem(PROJECT_KEY,JSON.stringify(projects));renderAll()}
+async function syncToCloud(showMessage=false){
+ if(!cloudReady||!currentUser)return;
+ try{
+  const {doc,setDoc,collection}=firebaseFns;
+  for(const l of leads) await setDoc(doc(db,'users',currentUser.uid,'leads',l.id),l,{merge:true});
+  for(const p of projects) await setDoc(doc(db,'users',currentUser.uid,'projects',encodeURIComponent(p)),{name:p},{merge:true});
+  $('authStatus').textContent=`Signed in: ${currentUser.email} · Synced ${new Date().toLocaleTimeString()}`;
+  if(showMessage)alert('Sync request complete.');
+ }catch(e){$('authStatus').textContent='Sync failed (local data safe): '+e.message}
+}
+loadLocal();renderAll();initFirebase();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
